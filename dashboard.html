@@ -1,0 +1,490 @@
+<meta http-equiv="refresh" content="1830"/>
+<script src="js/jquery-3.4.1.min.js" integrity="" crossorigin="anonymous"></script>
+<link href="bootstrap/3/bootstrap.min.css" rel="stylesheet" id="bootstrap-css">
+<script src="bootstrap/3/bootstrap.min.js"></script>
+<link href="style/style.css" rel="stylesheet" id="bootstrap-css">
+<script src='http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.5/jquery-ui.min.js'></script>
+<script src="https://printjs-4de6.kxcdn.com/print.min.js"></script>
+<link rel="stylesheet" type="text/css" href="https://printjs-4de6.kxcdn.com/print.min.css" />
+<script src="js/mfs.js"></script>
+<script src="bootstrap/4/bootstrap.min.js"></script>
+<script src="js/gijgo.min.js" type="text/javascript"></script>
+<link href="https://unpkg.com/gijgo@1.9.13/css/gijgo.min.css" rel="stylesheet" type="text/css" />
+<div id="throbber" style="display:none; min-height:120px;"></div>
+<input type="hidden" id="vendorid" value="" />
+<input type="hidden" id="foodService" value="" />
+<div class='hidden' id="isoDataDiv"></div>
+<div id="noty-holder"></div>
+<div id="wrapper">
+    <nav class="navbar navbar-inverse navbar-fixed-top" role="navigation">
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-ex1-collapse">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a class="navbar-brand" href="http://cijulenlinea.ucr.ac.cr/dev-users/" style="padding: 0;">
+                <img src="images/logo.png" alt="XDBS" style="height: 100%">
+            </a>
+        </div>
+        <ul class="nav navbar-right top-nav">
+            <li class="dropdown">
+             	<a href="#" class="dropdown-toggle" data-toggle="dropdown"><span id="UserName"></span> <b class="fa fa-angle-down"></b></a>
+           		<ul class="dropdown-menu">
+                <li class="divider"></li>
+                <li id="tokenClass"><a href="token"><i class="fa fa-angle-double-right"></i> Token</a></li>
+                <li><a href="logout"><i class="fa fa-fw fa-power-off"></i> Logout</a></li>
+                </ul>
+            </li>
+        </ul>
+        <div class="collapse navbar-collapse navbar-ex1-collapse">
+            <ul class="nav navbar-nav side-nav">
+                <li>
+                    <a href="#" data-toggle="collapse" data-target="#submenu-1"><i class="fa fa-fw fa-search"></i> Register <i class="fa fa-fw fa-angle-down pull-right"></i></a>
+                    <ul id="submenu-1" class="collapse">
+                        <li id="registerLink"><a href="#"><i class="fa fa-angle-double-right"></i> Register User</a></li>
+                    </ul>
+                </li>
+                <li>
+                    <a href="#" data-toggle="collapse" data-target="#submenu-2"><i class="fa fa-fw fa-star"></i>  Food Entry <i class="fa fa-fw fa-angle-down pull-right"></i></a>
+                    <ul id="submenu-2" class="collapse">
+                        <li id="dailyFoodLink"><a href="#"><i class="fa fa-angle-double-right"></i> Daily Entry</a></li>
+                    </ul>
+                </li>
+                <li>
+                    <a id="reports" href="#"><i class="fa fa-fw fa-user-plus"></i>  Reports</a>
+                </li>
+                <li>
+                	<a id="foodCountNav" href="#"></a>
+                </li>
+                <div id="tokenGeneration">
+                </div>
+
+                
+            </ul>
+        </div>
+    </nav>
+	<div id="register-user" style="display:block">
+        <div class="container-fluid">
+            <div class="row" id="main" >
+                <div class="col-sm-12 col-md-12 well" id="content">
+                    <h3>Register Employee!</h3>
+                </div>
+                <div class="container">
+                	<p>Please fill in this form to create an account.</p>
+				    <hr>
+				    <br/><br/><br/>
+				    <div id="authorizeId" class="form-group"> 
+					   	<label for="email"><b>You are not authorize for register users... Please contact admin</label>
+					</div>
+					<div id="authorizeRegistrationId"  class="col-sm-8 col-md-8">
+						<input type="hidden" id="ISOdataID" value="" />
+						<input type="hidden" id="txtStatus" value="" />
+					    <div class="form-group"> 
+					    	<label for="email"><b>Emp Id</b></label>
+					    	<input type="text" class="form-control" placeholder="Enter Emp Id" name="empId" id="empId" required>
+					    </div>
+					    <div class="form-group"> 
+						    <label for="name"><b>Name</b></label>
+						    <input type="text" class="form-control" placeholder="Enter Emp Name" name="empName" id="empName" required>
+					    </div>
+					    <div class="form-group"> 
+						    <label for="name"><b>Department</b></label>
+						    <select class="form-control" id="empDept"  name="empDept" style="width: 100%;">
+							</select>
+						</div>
+						<div class="form-group col-sm-6 col-md-6">
+							<label for="name"><b>Employee Status</b></label> 
+							<br><input type="radio" id="empStatus1" class="empStatus" name="empStatus" value="1" checked>Active 
+						    <br><input type="radio" id="empStatus0" class="empStatus" name="empStatus" value="0">De-Active 
+						</div>
+						<div class="form-group col-sm-6 col-md-6">
+							<label for="name"><b>2 times Food</b></label> 
+							<br><input type="radio" id="empFoodAllow0" class="empFoodAllow" name="empFoodAllow" value="0" checked>No 
+						    <br><input type="radio" id="empFoodAllow1" class="empFoodAllow" name="empFoodAllow" value="1">Yes
+						</div>
+						<div class="form-group"> 
+						    <label for="name"><b>Company Name</b></label>
+						    <select class="form-control" id="empComp" style="width: 100%;">
+							</select>
+						</div>
+					</div>
+					<div id="fingerPrintDiv" class="col-sm-4 col-md-4">
+						<div width="150px" height="190px" align="center" class="img">
+				        	<img id="imgFinger" width="145px" height="188px" src="images/thumb.png" alt="Finger Image">
+				        </div>
+					    <div class="form-group" align="center"> 
+					    	<input type="submit" id="btnCapture" value="Capture" class="btn btn-primary btn-100" onclick="return Capture()">
+					    </div>
+					</div>
+				    <hr>
+				    <div class="form-group" id="registerDiv"> 
+				    	<button type="button" class="form-control registerbtn btn-primary" id="registerBtn">Register Emp</button>
+				    </div>
+				</div>
+            </div>
+        </div>
+    </div>
+    <div id="FoodEntry" style="display:none">
+        <div class="container-fluid">
+            <div class="row" id="main" >
+            	<div class="col-sm-12 col-md-12 well">
+            		<div  id="foodEntryIdClass" class="col-sm-6 col-md-6 well text-center hidden" style="height:100%">
+	                	<div class="col-sm-12 col-md-12 well" id="content">
+		                    <h3>Entry for Food</h3>
+		                </div>
+		                <p>Please enter Employee Id for food.</p>
+						<hr>
+						<br/>
+					    <div class="form-group text-center">
+					    	<div class="col-sm-12 panel">
+							    <div class="col-sm-1">  </div> 	
+							    <div class="col-sm-2"> 
+							    	<span><b>Department<b></span>
+							    </div>
+							    <div class="col-sm-6"> 
+							    	<select class="form-control" id="empDeptFood"  name="empDeptFood" style="width: 100%;">
+									</select>
+							    </div>
+							    <div class="col-sm-3"> 
+							    	<input type="submit" id="btnCaptureAndMatch" value="Verify Bio" class="btn btn-primary btn-200" onclick="return matchBioBySuhas()"/>
+							    </div>
+						   	</div>
+					    	<div width="150px" height="190px" align="center" class="img">
+					        	<img id="imgFingerFake" width="145px" height="188px" src="images/thumb.png" alt="Finger Image">
+					        </div>
+						    
+						</div>
+					    <div class="form-group">
+					    	<div class="col-sm-4 col-md-4" style="padding: 5px;"> 
+					    		<label for="empFoodId"><b>Enter Emp Id:</b></label>
+					    	</div>
+					    	<div class="col-sm-4 col-md-4"> 
+					    		<input type="text" class="form-control" placeholder="Enter Emp Id" name="empFoodId" id="empFoodId" required>
+					    	</div>
+					    	<div class="col-sm-4 col-md-4"> 
+						    	<button type="button" class="form-control registerbtn btn-primary" id="entryFood">Enter</button>
+						    </div>
+					    </div>
+					    <hr>
+					    <div class="col-sm-12"> 
+						    <div class="col-sm-12 hidden">
+							   	<form method="post" action="#" id="printJS-form">
+							   		<div class="text-center">
+									  	<h2>Circle of Crust</h2>
+									  	<h1 style="font-weight: 600;font-size: 58px;" id="tokenID"></h1>
+									  	<h4 id="tokenTime"></h4>
+									  	<br>
+									  	<h6>..........................................</h6>
+									  	<h2>Circle of Crust</h2>
+									  	<h1 style="font-weight: 600;font-size: 58px;" id="tokenID1"></h1>
+									  	<h4 id="tokenTime1"></h4>
+									</div>
+							 	</form>
+								<button type="button" onclick="printJS('printJS-form', 'html')">
+								    Print Form
+								</button>
+							</div> 	
+						</div>
+						<div class="form-group text-center">
+						   	<span id="lastenterUser" style="color: green;font-weight: 600;"></span>
+						</div>
+					</div>
+					<div class="col-sm-6 col-md-6 well">
+						<h3>Last 50 records</h3>
+						<div class="col-sm-12 col-md-12 well" id="lastrecordslist">
+							<table>
+								<thead>
+								 	<tr>
+								    	<th>Emp Id</th>
+								    	<th>Emp Name</th>
+								    	<th>Food Type</th>
+								    	<th>Time</th>
+								  	</tr>
+								</thead>
+								<tbody id="lastEntries" style="font-size: 12px;">
+									
+								</tbody>
+							</table>
+							<div style="float:right;color: green;">
+								<b><span id="countFood" style="padding: 5px;"></span></b>
+							</div>
+						</div>
+					</div>
+				</div>
+			  </div>
+            </div>
+        </div>
+        <div id="report-page" style="display:none">
+	        <div class="container-fluid">
+    	        <div class="row" id="main" >
+        	        <div class="col-sm-12 col-md-12 well">
+            	        <h3>Report Page!</h3>
+                	</div>
+                	<div class="container">
+			    		<div class="col-sm-12 col-md-12 well">
+                			<h4>Monthly Food Serve report</h4>
+	                		<div class="col-sm-2 col-md-2">
+								From Date : <input type="text" id="dt1" placeholder="yyyy-mm-dd" style="border: 1px solid grey;border-radius: 5px;"/>
+						   	</div>
+
+						   	<div class="col-sm-2 col-md-2">
+								To Date : <input type="text" id="dt2" placeholder="yyyy-mm-dd" style="border: 1px solid grey;border-radius: 5px;" />
+						   	</div>
+						   	<div class="col-sm-3 col-md-3">
+								Food Vendor :
+								<br/>
+									<select  class="form-control" id="foodVendorList" style="width: 100%;">
+									</select>
+								
+							</div>
+					   		<div class="col-sm-2 col-md-2">
+								Meal Time :
+								<br/>
+								<select  class="form-control" id="mealType" style="width: 100%;">
+									<option value="0">---ALL---</option>
+									<option value="1">Lunch</option>
+									<option value="2">Dinner</option>
+								</select>
+						   	</div>
+						   	<div class="col-sm-3 col-md-3">
+				    			<button type="button" class="form-control registerbtn btn-primary" id="monthlyReport" style="min-height: 52px;">Download Report</button>
+				    		</div>
+			  			</div>
+			  			<div class="col-sm-12 col-md-12 admindiv well">
+                			<h4>VendorWise Daily Lunch Dinner Report</h4>
+	                		<div class="col-sm-3 col-md-3">
+								From Date : <input type="text" id="dlt1" placeholder="yyyy-mm-dd" style="border: 1px solid grey;border-radius: 5px;"/>
+						   	</div>
+
+						   	<div class="col-sm-3 col-md-3">
+								To Date : <input type="text" id="dlt2" placeholder="yyyy-mm-dd" style="border: 1px solid grey;border-radius: 5px;" />
+						   	</div>
+						   	<div class="col-sm-3 col-md-3">
+						   	</div>
+						   	<div class="col-sm-3 col-md-3">
+				    			<button type="button" class="form-control registerbtn btn-primary" id="vendorwiseLunchDinnerReport" style="min-height: 52px;">Download Report</button>
+				    		</div>
+			  			</div>
+			  			<div class="col-sm-12 col-md-12 admindiv well">
+                			<h4>Dashboard report</h4>
+	                		<div class="col-sm-3 col-md-3">
+								From Date : <input type="text" id="dDt1" placeholder="yyyy-mm-dd" style="border: 1px solid grey;border-radius: 5px;"/>
+						   	</div>
+
+						   	<div class="col-sm-3 col-md-3">
+								To Date : <input type="text" id="dDt2" placeholder="yyyy-mm-dd" style="border: 1px solid grey;border-radius: 5px;" />
+						   	</div>
+						   	<div class="col-sm-3 col-md-3">
+						   	</div>
+						   	<div class="col-sm-3 col-md-3">
+				    			<button type="button" class="form-control registerbtn btn-primary" id="dashboardReport" style="min-height: 52px;">Download Report</button>
+				    		</div>
+			  			</div>
+		  				<div class="col-sm-12 col-md-12 well admindiv">
+	                		<h4>Employee wise Food Serve report</h4>
+	                		<div class="col-sm-3 col-md-3">
+								Employee Id: <br><input type="text" id="empWiseReport" placeholder="Emp id" style="border: 1px solid grey;border-radius: 5px;"/>
+						   	</div>
+	                		<div class="col-sm-3 col-md-3">
+								From Date: <br><input type="text" id="empdt1" placeholder="yyyy-mm-dd" style="border: 1px solid grey;border-radius: 5px;"/>
+						   	</div>
+						   	<div class="col-sm-3 col-md-3">
+								To Date: <br><input type="text" id="empdt2" placeholder="yyyy-mm-dd" style="border: 1px solid grey;border-radius: 5px;" />
+						   	</div>
+						   	<div class="col-sm-3 col-md-3">
+					    		<button type="button" class="form-control registerbtn btn-primary" id="empFoodReport" style="min-height: 52px;">Download Report</button>
+					    	</div>
+				  		</div>
+				  		<div class="col-sm-12 col-md-12 well admindiv">
+	                		<h4>Employee List</h4>
+	                		<div class="col-sm-9 col-md-9">
+								Select Company:
+								<br/>
+								<select class="form-control" id="empCompWise" style="width: 100%;">
+								</select>
+						   	</div>
+						   	<div class="col-sm-3 col-md-3">
+					    		<button type="button" class="form-control registerbtn btn-primary" id="employeeListReport" style="min-height: 52px;">Download Employee List</button>
+					    	</div>
+			  			</div>
+				  		<div class="col-sm-12 col-md-12 well admindiv">
+	                		<h4>Deactivate Employee List</h4>
+	                		<div class="col-sm-9 col-md-9">
+								Enter comma seprated Employee Id :
+								<br/>
+								<textarea class="form-control" rows="5" id="deactivateEmpId"></textarea>	
+						   	</div>
+						   	<div class="col-sm-3 col-md-3">
+					    		<button type="button" class="form-control registerbtn btn-primary" id="employeeDeactivateReport" style="min-height: 52px;">Deactivate Employee</button>
+					    	</div>
+				  		</div>
+			  			<div class="col-sm-12 col-md-12 well admindiv">
+	                		<h4>Vendor: <button type="button" id="addNewVendor" class="btn btn-info">Add New +</button>
+	                			<button id="updateExistingVendor" type="button" class="btn btn-warning">Edit Vendor</button>
+	                		</h4>
+                			<span class="hidden" id="empCompWiseLbl">Select Company:</span>
+							<br/>
+							<select class="form-control hidden" id="vendorWise" style="width: 100%;">
+							</select>
+							<div class="form-group">
+								<label for="name"><b>Vendor Name</b></label> 
+								<input type="text" id="updateVendorName" class="form-control" required/> 
+							</div>
+							<div class="form-group ">
+								<label for="name"><b>UserName</b></label> 
+								<input type="text" id="updateVendorUserName" class="form-control" required/>
+							</div>
+							<div class="form-group ">
+								<label for="name"><b>New Password</b></label> 
+								<input type="password" id="updateVendorNewPass" class="form-control" required/>
+							</div>
+							<div class="form-group">
+								<label for="name"><b>Confirm Password</b></label> 
+								<input type="password" id="updateVendorConfirmPass" class="form-control" required/>
+							</div>
+							<div class="form-group ">
+								<label for="name"><b>Email Id</b></label> 
+								<input type="text" id="updateVendorEmail" class="form-control" required/>
+							</div>
+							<div class="form-group"> 
+							    <label for="name"><b>Food Type</b></label>
+							    <select class="form-control" id="foodVendorType" style="width: 100%;">
+								</select>
+							</div>
+							<div class="form-group"> 
+							    <label for="name"><b>Vendor Status</b></label>
+							    <select class="form-control" id="foodVendorStatus" style="width: 100%;">
+									<option value="1">Active</option>
+									<option value="0">De-active</option>
+								</select>
+							</div>
+							<div class="form-group" style="text-align:left"> 
+								<button type="button" id="UpdateVendorBtn" class="btn btn-success hidden">Update Vendor</button>
+								<button type="button" id="addVendorBtn" class="btn btn-success">Add New Vendor</button>
+						   	</div>
+			  			</div>
+				  	
+
+			  		<div class="hidden">
+			  			<table id="tblData">
+			  				<thead>
+							    <tr>
+							        <th>Emp Id</th>
+							        <th>Emp name</th>
+							        <th>Food Type</th>
+							        <th>Food Date</th>
+							        <th>Emp Company</th>
+							        <th>Food Vendor</th>
+							        <th>Time Interval</th>
+							    </tr>
+							</thead>
+							<tbody id="dataRecords" style="font-size: 12px;">
+							</tbody>
+						</table>
+						<table id="tblEmpData">
+			  				<thead>
+							    <tr>
+							        <th>Emp Id</th>
+							        <th>Emp Name</th>
+							        <th>Company</th>
+							        <th>Department</th>
+							        <th>Status</th>
+							        <th>2 times Food</th>
+							        <th>FingerPrint data</th>
+							    </tr>
+							</thead>
+							<tbody id="dataEmpRecords" style="font-size: 12px;">
+							</tbody>
+						</table>
+						<table id="tblEmpFoodData">
+			  				<thead>
+							    <tr>
+							    	<th>Sr. No</th>
+							        <th>Emp Id</th>
+							        <th>Emp name</th>
+							        <th>Food Type</th>
+							        <th>Date and Time</th>
+							        <th>Company</th>
+							    </tr>
+							</thead>
+							<tbody id="dataEmpFoodRecords" style="font-size: 12px;">
+							</tbody>
+						</table>
+						<table id="tblvendorWiseLunchDinnerData">
+			  				<thead>
+							    <tr>
+							    	<th>Date</th>
+							        <th>Time</th>
+							        <th>Vendor</th>
+							        <th>Count</th>
+							    </tr>
+							</thead>
+							<tbody id="datavendorwiseLunchDinnerRecords" style="font-size: 12px;">
+							</tbody>
+						</table>
+
+						<table id="tblDashboardData">
+			  				<thead>
+			  					<tr>
+							    	<td></td>
+							    </tr>
+							    <tr>
+							    	<td></td>
+							    </tr>
+							    <tr>
+							    	<th>Vendor</th>
+							        <th>Count</th>
+							    </tr>
+							</thead>
+							<tbody id="dataDashboardRecords1" style="font-size: 12px;">
+							</tbody>
+							<thead>
+							    <tr>
+							    	<td></td>
+							    </tr>
+							    <tr>
+							    	<td></td>
+							    </tr>
+							    <tr>
+							        <th>Emp Company</th>
+							        <th>Count</th>
+							    </tr>
+							</thead>
+							<tbody id="dataDashboardRecords2" style="font-size: 12px;">
+							</tbody>
+							<thead>
+							    <tr>
+							    	<td></td>
+							    </tr>
+							    <tr>
+							    	<td></td>
+							    </tr>
+							    <tr>
+							        <th>Interval</th>
+							        <th>Count</th>
+							    </tr>
+							</thead>
+							<tbody id="dataDashboardRecords3" style="font-size: 12px;">
+							</tbody>
+							<thead>
+							    <tr>
+							    	<td></td>
+							    </tr>
+							    <tr>
+							    	<td></td>
+							    </tr>
+							    <tr>
+							        <th>Total</th>
+							        <th id="dataDashboardRecords4"></th>
+							    </tr>
+							</thead>
+						</table>
+			  		</div>
+				</div>
+            </div>
+	    </div>
+    </div>
+</div><!-- /#wrapper -->
+<script type="text/javascript" src="js/comman.js?v=0.6"></script>

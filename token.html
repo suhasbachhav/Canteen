@@ -1,0 +1,58 @@
+<html>
+    <head>
+      	<title>token</title>
+      	<link rel="stylesheet" href="bootstrap/4/bootstrap.min.css" crossorigin="anonymous"/>
+      	<script src="js/jquery-3.2.1.slim.min.js" crossorigin="anonymous"></script>
+      	<script src="bootstrap/4/bootstrap.min.js" crossorigin="anonymous"></script>
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <style>
+            .xdbslogo {
+              background: url('images/logo.png') no-repeat center 10px;
+              -webkit-background-size: 255px;
+              -moz-background-size: 255px;
+              background-size: 255px;
+              -o-background-size: 255px;
+              height: 120px;
+            }
+            .texthead{
+                font-size: 71px;
+                font-family: fantasy;
+                color: #ff8d91;
+            }
+            .headline{ border-top: 5px solid rgba(0,0,0,.1); }
+            .textready{
+                font-size: 60px;
+                font-family: fantasy;
+                color: #2c7100;
+                display: inline-block;
+            }
+            .textprep{
+                font-size: 45px;
+                font-family: fantasy;
+                color: #001fff;
+                display: inline-block;
+            }
+            body{ background: #f1d7d7; }
+        </style>
+    </head>
+    <body>
+        <div class="container-fluid">
+            <div class="row">
+                <div class="col-sm-4 text-center texthead">Please Collect</div>
+                <div class="xdbslogo col-sm-4"></div>
+                <div class="col-sm-4 text-center texthead">Preparing...</div>
+            </div>
+            <hr class="headline">
+            <div class="row">
+                <div id="readyList" class="col-sm-5">
+                </div>
+                <div class="col-sm-2" style="border-right:4px solid #00000030;border-left:4px solid #00000030;"></div>
+                <div id="preparelist"  class="col-sm-5"></div>
+            </div>
+        </div>
+
+
+    </body>
+</html>
+<script src="js/jquery-3.4.1.min.js" integrity="" crossorigin="anonymous"></script>
+<script type="text/javascript" src="js/token.js"></script>

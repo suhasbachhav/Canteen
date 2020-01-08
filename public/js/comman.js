@@ -1,4 +1,4 @@
-var quality = 60;
+    var quality = 60;
 var timeout = 10;
 function showlastEntries(){
     $("#lastEntries , #dataRecords").html("");
@@ -30,6 +30,19 @@ function showlastEntries(){
     });
     queuePizza();
 }
+
+$("#tokenGeneration").delegate(".vegNonVegCls", 'click', function(){
+    if($(this).is(':checked')){
+        var empIdArr = $(this).attr('id');
+        var res = empIdArr.split("vegNonBegId-")[1];
+        sessionStorage.setItem(res, "1");
+    }else{
+        var empIdArr = $(this).attr('id');
+        var res = empIdArr.split("vegNonBegId-")[1];
+        sessionStorage.removeItem(res);
+    }
+});
+
 function queuePizza(){
     if($("#foodService").val() ==2){
         $.ajax({
@@ -41,11 +54,17 @@ function queuePizza(){
                 var html = '';
                 $.each(ObjRes, function (i , val){
                     if(val.status == 0)
-                        html +='<div class="cls-'+val.empId+'"><b><span style="margin: 2px;" >'+val.empId+'</span></b><button type="button" style="margin: 2px;" class="btn btn-xs btn-warning pizzaready" id="tokenReadyId-'+val.empId+'" data-srno="'+val.id+'">Ready</button><button type="button" style="margin: 2px;" class="btn btn-xs btn-success pizzaserved"  data-srno="'+val.id+'" id="tokenServed-'+val.empId+'" disabled>Served</button><br></div>';
+                        html +='<div class="cls-'+val.empId+'"><b><span style="margin: 2px;" >'+val.empId+'</span></b><button type="button" style="margin: 2px;" class="btn btn-xs btn-warning pizzaready" id="tokenReadyId-'+val.empId+'" data-srno="'+val.id+'">Ready</button><button type="button" style="margin: 2px;" class="btn btn-xs btn-success pizzaserved"  data-srno="'+val.id+'" id="tokenServed-'+val.empId+'" disabled>Served</button><input type="checkbox" class="vegNonVegCls" name="vegnonveg" id="vegNonBegId-'+val.empId+'"><br></div>';
                     else if(val.status == 1)
-                        html +='<div class="cls-'+val.empId+'"><b><span style="margin: 2px;" >'+val.empId+'</span></b><button type="button" style="margin: 2px;" class="btn btn-xs btn-warning pizzaready" id="tokenReadyId-'+val.empId+'" data-srno="'+val.id+'" disabled>Ready</button><button type="button" style="margin: 2px;" class="btn btn-xs btn-success pizzaserved" data-srno="'+val.id+'" id="tokenServed-'+val.empId+'" >Served</button><br></div>';
+                        html +='<div class="cls-'+val.empId+'"><b><span style="margin: 2px;" >'+val.empId+'</span></b><button type="button" style="margin: 2px;" class="btn btn-xs btn-warning pizzaready" id="tokenReadyId-'+val.empId+'" data-srno="'+val.id+'" disabled>Ready</button><button type="button" style="margin: 2px;" class="btn btn-xs btn-success pizzaserved" data-srno="'+val.id+'" id="tokenServed-'+val.empId+'" >Served</button><input type="checkbox" class="vegNonVegCls" name="vegnonveg" id="vegNonBegId-'+val.empId+'"><br></div>';
                 });
                 $("#tokenGeneration").html(html);
+                $.each(Object.keys(sessionStorage), function (i , val){
+                    if(sessionStorage.getItem(val)){
+                        var idV = "#vegNonBegId-"+val;
+                        $(idV).prop('checked', true);
+                    }
+                });
             },
             error: function(err) {
                 console.log(err);
@@ -108,7 +127,9 @@ function matchBioBySuhas() {
     var className = ".isoClass-"+$("#empDeptFood").val();
     var iCount = $(className).length;
     var areFieldEmpty;
+    console.log(className);
     $(className).each(function(eriii) {
+        console.log(className);
         if($(this).val() != '') var areFieldEmpty = 0;
         else var areFieldEmpty = 1;
         isotemplate = $(this).val();
@@ -172,6 +193,23 @@ $("#addNewVendor").click(function() {
     $("#vendorWise , #empCompWiseLbl, #UpdateVendorBtn").addClass('hidden');
     $("#addVendorBtn").removeClass('hidden');
 });
+$("#updateExistingCompany").click(function() {
+    $("#empCompLbl , #companyDropdwn ,  #UpdateCompanyBtn").removeClass('hidden');
+    $("#addCompanyBtn").addClass('hidden');
+});
+$("#addNewCompany").click(function() {
+    $("#empCompLbl , #companyDropdwn ,  #UpdateCompanyBtn").addClass('hidden');
+    $("#addCompanyBtn").removeClass('hidden');
+});
+$("#updateExistingDepartment").click(function() {
+    $("#empDepartmentLbl , #departmentDropdwn ,  #UpdateDepartmentBtn").removeClass('hidden');
+    $("#addDepartmentBtn").addClass('hidden');
+});
+$("#addNewDepartment").click(function() {
+    $("#empDepartmentLbl , #departmentDropdwn ,  #UpdateDepartmentBtn").addClass('hidden');
+    $("#addDepartmentBtn").removeClass('hidden');
+});
+
 $("#queuefinger").click(function() { interval = setInterval(function(){ $("#btnCaptureAndMatch").click(); }, 5000); });
 $("#queueStopfinger").click(function() { clearInterval(interval); });
 $(function() {
@@ -230,6 +268,7 @@ $("#tokenGeneration").delegate(".pizzaserved", 'click', function(){
          data: paramdata,
         ContentType: 'application/json',
         success: function(resultData) {
+            sessionStorage.removeItem(res);
             queuePizza();
         },
         error: function(err) {
@@ -238,8 +277,10 @@ $("#tokenGeneration").delegate(".pizzaserved", 'click', function(){
     });
 });
 $("#entryFood").click(function() {
+    $("#entryFood").attr("disabled", true);
     if ($("#empFoodId").val() == '') {
         alert("Please enter Employee Id");
+        $("#entryFood").attr("disabled", false);
         return;
     } 
     var paramdata = {
@@ -253,6 +294,7 @@ $("#entryFood").click(function() {
         data: paramdata,
         ContentType: 'application/json',
         success: function(resultData) {
+            $("#entryFood").attr("disabled", false);
             showlastEntries();
             $("#lastenterUser").html();
             $("#empFoodId").val();
@@ -473,7 +515,127 @@ $("#addVendorBtn").click(function() {
             if (resultData) {
                 alert("Vendor Added Succesfully");
                 location.reload();
-            } else alert("Please refrsh and check again");
+            } else 
+                alert("Please refrsh and check again");
+        },
+        error: function(err) {
+            console.log(err);
+        }
+    });
+});
+$("#addCompanyBtn").click(function() {
+    if ($("#updateCompanyName").val() == '') {
+        alert("Please enter Company Name");
+        return;
+    }
+    var paramdata = {
+        updateCompanyName: $("#updateCompanyName").val()
+    };
+    $.ajax({
+        url: "addCompany",
+        method: "POST",
+        data: paramdata,
+        ContentType: 'application/json',
+        success: function(resultData) {
+            if (resultData) {
+                alert("Company Added Succesfully");
+                getCompany();
+                $("#updateCompanyName").val('');
+            } else 
+                alert("Please refrsh and check again");
+        },
+        error: function(err) {
+            console.log(err);
+        }
+    });
+});
+$("#UpdateCompanyBtn").click(function() {
+     if ($("#updateCompanyName").val() == '') {
+        alert("Please enter Company Name");
+        return;
+    }else if ($("#companyDropdwn").val() == '') {
+        alert("Please Select Company");
+        return;
+    }
+    var paramdata = {
+        updateCompanyName: $("#updateCompanyName").val(),
+        updateCompanyId: $("#companyDropdwn").val()
+    };
+    $.ajax({
+        url: "updateCompany",
+        method: "POST",
+        data: paramdata,
+        ContentType: 'application/json',
+        success: function(resultData) {
+            if (resultData == "Updated"){
+                alert("Company Updated Succesfully");
+                getCompany();
+                $("#updateCompanyName").val('');
+            }else
+                alert("Please refrsh and check again");
+        },
+        error: function(err) {
+            console.log(err);
+        }
+    });
+});
+$("#addDepartmentBtn").click(function() {
+    if ($("#updateDepartmentName").val() == '') {
+        alert("Please enter Company Name");
+        return;
+    }
+    var paramdata = {
+        updateDepartmentName: $("#updateDepartmentName").val()
+    };
+    $.ajax({
+        url: "addDepartment",
+        method: "POST",
+        data: paramdata,
+        ContentType: 'application/json',
+        success: function(resultData) {
+            if (resultData) {
+                alert("Department Added Succesfully");
+                getDepartment();
+                $("#updateDepartmentName").val('');
+            } else 
+                alert("Please refrsh and check again");
+        },
+        error: function(err) {
+            console.log(err);
+        }
+    });
+});
+$("#companyDropdwn").change(function() {
+    $("#updateCompanyName").val($("#companyDropdwn option:selected").text());    
+});
+$("#departmentDropdwn").change(function() {
+    $("#updateDepartmentName").val($("#departmentDropdwn option:selected").text());    
+});
+$("#UpdateDepartmentBtn").click(function() {
+    if ($("#updateDepartmentName").val() == '') {
+        alert("Please enter Company Name");
+        return;
+    }else if ($("#departmentDropdwn").val() == '') {
+        alert("Please Select Department");
+        return;
+    }
+    var paramdata = {
+        updateDepartmentName: $("#updateDepartmentName").val(),
+        updateDepartmentId: $("#departmentDropdwn").val()
+    };
+    $.ajax({
+        url: "updateDepartment",
+        method: "POST",
+        data: paramdata,
+        ContentType: 'application/json',
+        success: function(resultData) {
+            if (resultData == "Updated"){
+                alert("Department Updated Succesfully");
+                getDepartment();
+                $("#updateDepartmentName").val('');
+            }
+            else
+                alert("Please refrsh and check again");
         },
         error: function(err) {
             console.log(err);
@@ -481,6 +643,13 @@ $("#addVendorBtn").click(function() {
     });
 });
 $(document).ready(function() {
+    var d = new Date(); // for now
+    var hr = d.getHours(); // => 9
+    var min = d.getMinutes(); // =>  30
+    if(hr == 12 && min < 5){
+        sessionStorage.clear();
+    }
+
     setInterval(function(){ 
         if($("#foodService").val() == 0) showlastEntries();    
     }, 8000);
@@ -552,26 +721,7 @@ $(document).ready(function() {
     $('#empdt2').datepicker({
         format: "yyyy-mm-dd"
     });
-    $.ajax({
-        url: "getcompany",
-        method: "GET",
-        data: '',
-        ContentType: 'application/json',
-        success: function(resultData) {
-            resultData = JSON.parse(resultData)
-            var html ="<option value=''>---SELECT---</option>";
-            var htmlCompWise ="<option value='0'>---ALL---</option>";
-            $.each(resultData, function (i , val){
-                htmlCompWise += "<option value='"+val.compID+"'>"+val.comp_name+"</option> ";
-                html += "<option value='"+val.compID+"'>"+val.comp_name+"</option> ";
-            });
-            $("#empComp").html(html);
-            $("#empCompWise").html(htmlCompWise);
-        },
-        error: function(err) {
-            console.log(err);
-        }
-    });
+    getCompany();
     $.ajax({
         url: "getusers",
         method: "GET",
@@ -652,23 +802,7 @@ $(document).ready(function() {
             console.log(err);
         }
     });
-    $.ajax({
-        url: "getDepartment",
-        method: "GET",
-        data: '',
-        ContentType: 'application/json',
-        success: function(resultData) {
-            var resultDataArr = JSON.parse(resultData);
-            var html ='<option value="0">-Select Department-</option>';
-            $.each(resultDataArr, function (i , val){
-                html += '<option value="'+val.id+'">'+val.dept_name+'</option>';
-            });
-            $("#empDept , #empDeptFood").html(html);
-        },
-        error: function(err) {
-            console.log(err);
-        }
-    });
+    getDepartment();
     $.ajax({
         url: "getIsoData",
         method: "POST",
@@ -687,6 +821,54 @@ $(document).ready(function() {
         }
     });
 });
+function getDepartment(){
+    $.ajax({
+        url: "getDepartment",
+        method: "GET",
+        data: '',
+        ContentType: 'application/json',
+        success: function(resultData) {
+            var resultDataArr = JSON.parse(resultData);
+            var html ='<option value="0">-Select Department-</option>';
+            var htmlUDept ='';
+            $.each(resultDataArr, function (i , val){
+                html += '<option value="'+val.id+'">'+val.dept_name+'</option>';
+                htmlUDept += '<option value="'+val.id+'">'+val.dept_name+'</option>';
+            });
+            $("#empDept , #empDeptFood").html(html);
+            $("#departmentDropdwn").html(html);
+        },
+        error: function(err) {
+            console.log(err);
+        }
+    });
+}
+function getCompany(){
+    $.ajax({
+            url: "getcompany",
+            method: "GET",
+            data: '',
+            ContentType: 'application/json',
+            success: function(resultData) {
+                resultData = JSON.parse(resultData)
+                var html ="<option value=''>---SELECT---</option>";
+                var htmlCompWise ="<option value='0'>---ALL---</option>";
+                var htmlUComp ="";
+                $.each(resultData, function (i , val){
+                    htmlCompWise += "<option value='"+val.compID+"'>"+val.comp_name+"</option> ";
+                    html += "<option value='"+val.compID+"'>"+val.comp_name+"</option> ";
+                    htmlUComp += "<option value='"+val.compID+"'>"+val.comp_name+"</option> ";
+                });
+                $("#empComp").html(html);
+                $("#companyDropdwn").html(htmlUComp);
+                $("#empCompWise").html(htmlCompWise);
+            },
+            error: function(err) {
+                console.log(err);
+            }
+        });
+
+}
 $("#empId").on('change',function(e) {
     if($(this).val().length > 2){
         var paramdata = {

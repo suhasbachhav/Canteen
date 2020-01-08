@@ -365,6 +365,52 @@
 								<button type="button" id="addVendorBtn" class="btn btn-success">Add New Vendor</button>
 						   	</div>
 			  			</div>
+
+			  			<div class="col-sm-6 col-md-6 well admindiv">
+	                		<h4>Company: </h4>
+	                		<div class="form-group col-md-12">
+	                			<button type="button" id="addNewCompany" class="btn btn-info">Add New +</button>
+	                			<button id="updateExistingCompany" type="button" class="btn btn-warning">Edit Company</button>
+	                		</div>
+                			
+							<div class="form-group col-md-12">
+								<span class="hidden" id="empCompLbl">Select Company:</span>
+								<select class="form-control col-md-12 hidden" id="companyDropdwn">
+								</select>
+							</div>
+							<div class="form-group col-md-12">
+								<label for="name"><b>Company Name:</b></label> 
+								<input type="text" id="updateCompanyName" class="form-control" required/>
+							</div>
+							<div class="form-group col-md-12" style="text-align:left"> 
+								<button type="button" id="UpdateCompanyBtn" class="btn btn-success hidden">Update Company</button>
+								<button type="button" id="addCompanyBtn" class="btn btn-success">Add New Company</button>
+						   	</div>
+			  			</div>
+
+			  			<div class="col-sm-6 col-md-6 well admindiv">
+	                		<h4>Department: </h4>
+	                		<div class="form-group col-md-12">
+	                			<button type="button" id="addNewDepartment" class="btn btn-info">Add New +</button>
+	                			<button id="updateExistingDepartment" type="button" class="btn btn-warning">Edit Department</button>
+	                		</div>
+                			
+							<div class="form-group col-md-12">
+								<span class="hidden" id="empDepartmentLbl">Select Department:</span>
+								<select class="form-control col-md-12 hidden" id="departmentDropdwn">
+								</select>
+							</div>
+							<div class="form-group col-md-12">
+								<label for="name"><b>Department Name:</b></label> 
+								<input type="text" id="updateDepartmentName" class="form-control" required/>
+							</div>
+							<div class="form-group col-md-12" style="text-align:left"> 
+								<button type="button" id="UpdateDepartmentBtn" class="btn btn-success hidden">Update Department</button>
+								<button type="button" id="addDepartmentBtn" class="btn btn-success">Add New Department</button>
+						   	</div>
+			  			</div>
+
+			  	
 				  	
 
 			  		<div class="hidden">
@@ -487,4 +533,4 @@
 	    </div>
     </div>
 </div><!-- /#wrapper -->
-<script type="text/javascript" src="js/comman.js?v=0.6"></script>
+<script type="text/javascript" src="js/comman.js?v=0.13"></script>

@@ -167,7 +167,7 @@ app.post('/getlastrecords', function(req,res){
 	var currentChecktime = "01/01/2011 "+currentTime;
 
 	if (Date.parse('01/01/2011 02:00:00') >= Date.parse(currentChecktime) && Date.parse('01/01/2011 00:00:01') <= Date.parse(currentChecktime)){
-		var currDateTime = today.getFullYear()+'-'+(today.getMonth()+1)+'-'+today.setDate(today.getDate()-1)+' 17:00:00';
+		var currDateTime = today.getFullYear()+'-'+(today.getMonth()+1)+'-'+(today.getDate()-1)+' 17:00:00';
 	}else if (Date.parse('01/01/2011 17:00:00') >= Date.parse(currentChecktime) && Date.parse('01/01/2011 02:00:00') < Date.parse(currentChecktime)){
 		var currDateTime = today.getFullYear()+'-'+(today.getMonth()+1)+'-'+today.getDate()+' 02:00:00';
 	}else {
@@ -199,7 +199,7 @@ app.post('/getqueuePizza', function(req,res){
 	var currentChecktime = "01/01/2011 "+currentTime;
 
 	if (Date.parse('01/01/2011 02:00:00') >= Date.parse(currentChecktime) && Date.parse('01/01/2011 00:00:01') <= Date.parse(currentChecktime)){
-		var currDateTime = today.getFullYear()+'-'+(today.getMonth()+1)+'-'+today.setDate(today.getDate()-1)+' 17:00:00';
+		var currDateTime = today.getFullYear()+'-'+(today.getMonth()+1)+'-'+(today.getDate()-1)+' 17:00:00';
 	}else if (Date.parse('01/01/2011 17:00:00') >= Date.parse(currentChecktime) && Date.parse('01/01/2011 02:00:00') < Date.parse(currentChecktime)){
 		var currDateTime = today.getFullYear()+'-'+(today.getMonth()+1)+'-'+today.getDate()+' 02:00:00';
 	}else {
@@ -257,7 +257,7 @@ app.post('/foodEntry',function(request,response){
 	var currentTime = today.getHours() + ":" + today.getMinutes() + ":" + today.getSeconds();
 	var currentChecktime = "01/01/2011 "+currentTime;
 	if (Date.parse('01/01/2011 02:00:00') >= Date.parse(currentChecktime)){
-		var currDateTime = today.getFullYear()+'-'+(today.getMonth()+1)+'-'+today.setDate(today.getDate()-1)+' 17:00:00';
+		var currDateTime = today.getFullYear()+'-'+(today.getMonth()+1)+'-'+(today.getDate()-1)+' 17:00:00';
 	}else{
 		var currDateTime = today.getFullYear()+'-'+(today.getMonth()+1)+'-'+today.getDate()+' 02:00:00';
 	}
@@ -436,7 +436,7 @@ app.post('/gettokenscreendata', function(req,res){
 	var currentChecktime = "01/01/2011 "+currentTime;
 
 	if (Date.parse('01/01/2011 02:00:00') >= Date.parse(currentChecktime) && Date.parse('01/01/2011 00:00:01') <= Date.parse(currentChecktime)){
-		var currDateTime = today.getFullYear()+'-'+(today.getMonth()+1)+'-'+today.setDate(today.getDate()-1)+' 17:00:00';
+		var currDateTime = today.getFullYear()+'-'+(today.getMonth()+1)+'-'+(today.getDate()-1)+' 17:00:00';
 	}else if (Date.parse('01/01/2011 17:00:00') >= Date.parse(currentChecktime) && Date.parse('01/01/2011 02:00:00') < Date.parse(currentChecktime)){
 		var currDateTime = today.getFullYear()+'-'+(today.getMonth()+1)+'-'+today.getDate()+' 02:00:00';
 	}else {
@@ -493,6 +493,57 @@ app.post('/addVendor',function(request,response){
 			var fresult = "1";
 		}else{
 			var fresult = "0";
+		}
+		response.send(fresult);
+    });
+});
+
+app.post('/addCompany',function(request,response){
+	var updateCompanyName = request.body.updateCompanyName;
+	var address = "Pune";
+	var status = 1;
+	con.query( "INSERT INTO `company` (`comp_name`, `address`, `status`) VALUES (?, ?, ?)", [updateCompanyName , address , status], function (error, result, client){
+        if(result.affectedRows > 0){
+			var fresult = "1";
+		}else{
+			var fresult = "0";
+		}
+		response.send(fresult);
+    });
+});
+app.post('/updateCompany',function(request,response){
+	var updateCompanyName = request.body.updateCompanyName;
+	var updateCompanyId = request.body.updateCompanyId;
+	con.query( "UPDATE `company` SET `comp_name` = ? WHERE `company`.`compID` = ?", [updateCompanyName , updateCompanyId ], function (error, result, client){
+        if(result.affectedRows > 0){
+			var fresult = "Updated";
+		}else{
+			var fresult = "Not Updated";
+		}
+		response.send(fresult);
+    });
+});
+app.post('/addDepartment',function(request,response){
+	var updateDepartmentName = request.body.updateDepartmentName;
+	var address = "Pune";
+	var status = 1;
+	con.query( "INSERT INTO `departments` (`dept_name`) VALUES (?)", [updateDepartmentName], function (error, result, client){
+        if(result.affectedRows > 0){
+			var fresult = "1";
+		}else{
+			var fresult = "0";
+		}
+		response.send(fresult);
+    });
+});
+app.post('/updateDepartment',function(request,response){
+	var updateDepartmentName = request.body.updateDepartmentName;
+	var updateDepartmentId = request.body.updateDepartmentId;
+	con.query( "UPDATE `departments` SET `dept_name` = ? WHERE `departments`.`id` = ?", [updateDepartmentName , updateDepartmentId ], function (error, result, client){
+        if(result.affectedRows > 0){
+			var fresult = "Updated";
+		}else{
+			var fresult = "Not Updated";
 		}
 		response.send(fresult);
     });

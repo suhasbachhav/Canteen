@@ -1,11 +1,10 @@
 var mysql = require('mysql');  
 var md5 = require('md5');
-var http = require('http');
+//var http = require('http');
 var express = require('express');
 var session = require('express-session');
 var bodyParser = require('body-parser');
 var path = require('path');
-var async = require('async');
 const port = 8001;
 
 var con = mysql.createConnection({  
@@ -37,6 +36,9 @@ app.post('/',function(request,response){
 	var password = md5(request.body.psw);
 	if (username && password) {
 		con.query('SELECT * FROM users WHERE status = 1 AND username = ? AND password = ?', [username, password], function(error, results, fields) {
+			
+			if(error) throw error;
+
 			if (results.length > 0) {
 				request.session.loggedin = true;
 				request.session.Uid = results[0].id;
@@ -565,7 +567,37 @@ app.post('/downloadvendorwiseLunchDinnerReport',function(request,response){
     });
 });
 
-
+app.get('/getDailyCountGraphValues', function(request, response){
+  	var today = new Date();
+	var currentTime = today.getHours() + ":" + today.getMinutes() + ":" + today.getSeconds();
+	var currentChecktime = "01/01/2011 "+currentTime;
+	if (Date.parse('01/01/2011 02:00:00') >= Date.parse(currentChecktime) && Date.parse('01/01/2011 00:00:01') <= Date.parse(currentChecktime)){
+		var currDateTime = today.getFullYear()+'-'+(today.getMonth()+1)+'-'+(today.getDate()-1)+' 02:00:00';
+	}else {
+		var currDateTime = today.getFullYear()+'-'+(today.getMonth()+1)+'-'+today.getDate()+' 02:00:00';
+	}
+	var qryDay= "SELECT users.vendor AS food , COUNT(dailyfood.id) as countFood FROM dailyfood JOIN foodtype ON dailyfood.FoodType = foodtype.id JOIN users ON users.id = dailyfood.updatedby WHERE date_time >='"+currDateTime+"' GROUP BY dailyfood.updatedby";
+	var d = new Date();
+  	var day = d.getDay(),
+    diff = d.getDate() - day + (day == 0 ? -6:1);
+  	var newDate = new Date(d.setDate(diff));
+  	var currWeekTime = newDate.getFullYear()+'-'+(newDate.getMonth()+1)+'-'+(newDate.getDate())+' 02:00:00';
+  	var qryWeek= "SELECT users.vendor AS food , COUNT(dailyfood.id) as countFood FROM dailyfood JOIN foodtype ON dailyfood.FoodType = foodtype.id JOIN users ON users.id = dailyfood.updatedby WHERE date_time >='"+currWeekTime+"' GROUP BY dailyfood.updatedby";
+  	var currMonthTime = today.getFullYear()+'-'+(today.getMonth()+1)+'-1 02:00:00';
+  	var qryMonth= "SELECT users.vendor AS food , COUNT(dailyfood.id) as countFood FROM dailyfood JOIN foodtype ON dailyfood.FoodType = foodtype.id JOIN users ON users.id = dailyfood.updatedby WHERE date_time >='"+currMonthTime+"' GROUP BY dailyfood.updatedby";
+	
+  	con.query(qryMonth, function (error, result, client){
+        var qryMonthResult = result;
+        con.query(qryWeek, function (error, res3, client){
+    		var qryWeekResult = res3;
+    		con.query(qryDay, function (error, res4, client){
+    			var qryDayResult = res4;
+        		var resultFinal = JSON.stringify({qryDayRes:qryDayResult, qryWeekRes:qryWeekResult , qryMonthRes:qryMonthResult});
+       			response.send(resultFinal);
+       		});
+    	});
+    });
+});
 app.listen(port);
 
 

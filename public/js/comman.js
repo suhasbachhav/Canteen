@@ -185,6 +185,89 @@ $("#reports").click(function() {
     $("#register-user , #FoodEntry").hide();
     $("#report-page").show();
 });
+function pieChartData() {
+    var dayWise = $('#dayWisePichart');
+    var weekWise = $('#weekWisePichart');
+    var monthWise = $('#monthWisePichart');
+    var backgroundColor = new Array('rgba(255, 99, 132, 0.5)','rgba(54, 162, 235, 0.5)','rgba(255, 206, 86, 0.5)','rgba(0, 230, 64, 0.5)','rgb(255,0,255,0.5)','rgb(139,0,0,0.5)');
+    var backgroundColor = new Array('rgba(255, 99, 132, 1)','rgba(54, 162, 235, 1)','rgba(255, 206, 86, 1)','rgba(0, 230, 64, 1)','rgb(255,0,255,1)','rgb(139,0,0,1)');
+    var qryDayResLabel = new Array();
+    var qryDayResCount = new Array();
+    var qryWeekResLabel = new Array();
+    var qryWeekResCount = new Array();
+    var qryMonthResLabel = new Array();
+    var qryMonthResCount = new Array();
+   // var arr = [];
+    $.ajax({
+        url: "getDailyCountGraphValues",
+        method: "GET",
+        data: '',
+        ContentType: 'application/json',
+        success: function(resultData) {
+            resultData = JSON.parse(resultData);
+            for(var k in resultData.qryDayRes) {
+                qryDayResLabel.push(resultData.qryDayRes[k].food);
+                qryDayResCount.push(resultData.qryDayRes[k].countFood);
+            }
+            for(var j in resultData.qryWeekRes) {
+                qryWeekResLabel.push(resultData.qryWeekRes[j].food);
+                qryWeekResCount.push(resultData.qryWeekRes[j].countFood);
+            }
+            for(var l in resultData.qryMonthRes) {
+                qryMonthResLabel.push(resultData.qryMonthRes[l].food);
+                qryMonthResCount.push(resultData.qryMonthRes[l].countFood);
+            }
+
+            var dayWisePichart = new Chart(dayWise, {
+            type: 'doughnut',
+            data: {
+                labels: qryDayResLabel,
+                datasets: [{
+                    label: '# of Votes',
+                    data: qryDayResCount,
+                    backgroundColor: backgroundColor,
+                    borderColor: backgroundColor,
+                    borderWidth: 1
+                    }]
+                },
+            });
+
+            var weekWisePichart = new Chart(weekWise, {
+                type: 'doughnut',
+                data: {
+                    labels: qryWeekResLabel,
+                    datasets: [{
+                        label: '# of Votes',
+                        data: qryWeekResCount,
+                        backgroundColor: backgroundColor,
+                        borderColor: backgroundColor,
+                        borderWidth: 1
+                    }]
+                },
+            });
+
+            var monthWisePichart = new Chart(monthWise, {
+                type: 'doughnut',
+                data: {
+                    labels: qryMonthResLabel,
+                    datasets: [{
+                        label: '# of Votes',
+                        data: qryMonthResCount,
+                        backgroundColor: backgroundColor,
+                        borderColor: backgroundColor,
+                        borderWidth: 1
+                    }]
+                },
+            });
+        },
+        error: function(err) {
+            console.log(err);
+        }
+    });
+}
+setInterval(function(){ 
+    pieChartData();
+}, 10000); 
 $("#updateExistingVendor").click(function() {
     $("#vendorWise , #empCompWiseLbl ,  #UpdateVendorBtn").removeClass('hidden');
     $("#addVendorBtn").addClass('hidden');
@@ -643,6 +726,7 @@ $("#UpdateDepartmentBtn").click(function() {
     });
 });
 $(document).ready(function() {
+	pieChartData();
     var d = new Date(); // for now
     var hr = d.getHours(); // => 9
     var min = d.getMinutes(); // =>  30

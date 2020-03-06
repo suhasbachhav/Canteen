@@ -197,7 +197,7 @@ function pieChartData() {
     var qryWeekResCount = new Array();
     var qryMonthResLabel = new Array();
     var qryMonthResCount = new Array();
-   // var arr = [];
+    
     $.ajax({
         url: "getDailyCountGraphValues",
         method: "GET",
@@ -217,20 +217,21 @@ function pieChartData() {
                 qryMonthResLabel.push(resultData.qryMonthRes[l].food);
                 qryMonthResCount.push(resultData.qryMonthRes[l].countFood);
             }
-
+            //console.log(qryWeekResLabel)
             var dayWisePichart = new Chart(dayWise, {
-            type: 'doughnut',
-            data: {
-                labels: qryDayResLabel,
-                datasets: [{
-                    label: '# of Votes',
-                    data: qryDayResCount,
-                    backgroundColor: backgroundColor,
-                    borderColor: backgroundColor,
-                    borderWidth: 1
+                type: 'doughnut',
+                data: {
+                    labels: qryDayResLabel,
+                    datasets: [{
+                        label: '# of Votes',
+                        data: qryDayResCount,
+                        backgroundColor: backgroundColor,
+                        borderColor: backgroundColor,
+                        borderWidth: 1
                     }]
                 },
             });
+
 
             var weekWisePichart = new Chart(weekWise, {
                 type: 'doughnut',
@@ -404,14 +405,17 @@ $("#employeeDeactivateReport").click(function() {
     var paramdata = {
         deactivateEmpId: $("#deactivateEmpId").val()
     };
+    $("#employeeDeactivateReport").removeClass("hidden")
     $.ajax({
         url: "deactivateemployeelist",
         method: "POST",
         data: paramdata,
         ContentType: 'application/json',
         success: function(resultData) {
-            if (resultData == "Updated")  alert("Employee Updated Succesfully");
-            else alert("Something is wrong, Please refrsh and try again");
+            if (resultData == "Updated"){  
+                $("#employeeDeactivateReport").addClass("hidden")
+                alert("Employee Updated Succesfully");
+            }else alert("Something is wrong, Please refrsh and try again");
         },
         error: function(err) {
             console.log(err);
@@ -419,12 +423,29 @@ $("#employeeDeactivateReport").click(function() {
     });
 });
 $("#empFoodReport").on('click',function(e) {
+    var currDate = new Date();
+    var fDate = new Date($("#empdt1").val());
+    var tDate = new Date($("#empdt2").val());
+    if(!$("#empdt1").val()){
+        alert("Please enter Start date");
+        return;
+    }else if(!$("#empdt2").val()){
+        alert("Please enter End date");
+        return;
+    }else if(currDate < fDate || currDate < tDate){
+        alert("Date should be past Date!");
+        return;
+    }else if(fDate > tDate){
+        alert("Please enter End date is greater than start Date!");
+        return;       
+    }
     var paramdata = {
         date1: $("#empdt1").val(),
         date2: $("#empdt2").val(),
         empId: $("#empWiseReport").val()
     };
     $("#dataRecords").html('');
+    $("#employeeReportLoader").removeClass("hidden")
     $.ajax({
         url: "downloadEmpFoodReport",
         method: "POST",
@@ -445,10 +466,13 @@ $("#empFoodReport").on('click',function(e) {
                     if(ttl == ic){
                         var reportName = "empfoodreport-frm:"+$("#empdt1").val()+"-to:"+$("#empdt2").val()+"-for:"+$("#empWiseReport").val();
                         exportTableToExcel('tblEmpFoodData', reportName);
+                        $("#employeeReportLoader").addClass("hidden");
                     }
                 });
             }else{
                 $("#dataEmpFoodRecords").html('');
+                $("#employeeReportLoader").addClass("hidden");
+                alert("Data not available for selection criteria");
             }
         }
     });
@@ -458,6 +482,7 @@ $("#employeeListReport").on('click',function(e) {
         empCompWise: $("#empCompWise").val()
     };
     $("#dataEmpRecords").html('');
+    $("#employeeListLoader").addClass("hidden");
     $.ajax({
         url: "downloadEmpReport",
         method: "POST",
@@ -483,10 +508,13 @@ $("#employeeListReport").on('click',function(e) {
                 $.each(ObjRes, function (ie , val){
                     if(ttle == ie){
                         exportTableToExcel('tblEmpData', "emplyeeReportList");
+                        $("#employeeListLoader").addClass("hidden");
                     }
                 });
             }else{
                 $("#dataEmpRecords").html('');
+                $("#employeeListLoader").addClass("hidden");
+                alert("Data not available for selection criteria");
             }
         }
     });
@@ -1040,6 +1068,22 @@ $("#registerBtn").click(function() {
     });
 });
 $("#monthlyReport").on('click',function(e) {
+    var currDate = new Date();
+    var fDate = new Date($("#dt1").val());
+    var tDate = new Date($("#dt2").val());
+    if(!$("#dt1").val()){
+        alert("Please enter Start date");
+        return;
+    }else if(!$("#dt2").val()){
+        alert("Please enter End date");
+        return;
+    }else if(currDate < fDate || currDate < tDate){
+        alert("Date should be past Date!");
+        return;
+    }else if(fDate > tDate){
+        alert("Please enter End date is greater than start Date!");
+        return;       
+    }
     var paramdata = {
         date1: $("#dt1").val(),
         date2: $("#dt2").val(),
@@ -1047,13 +1091,13 @@ $("#monthlyReport").on('click',function(e) {
         mealType : $("#mealType").val()
     };
     $("#dataRecords").html('');
+    $("#monthlyReportLoader").removeClass("hidden")
     $.ajax({
         url: "downloadFoodServeReport",
         method: "POST",
         data: paramdata,
         ContentType: 'application/json',
         success: function(resultData) {
-            console.log(resultData);
             if(resultData){
                 var ObjRes = JSON.parse(resultData);
                 var htmlRes = '';
@@ -1066,18 +1110,40 @@ $("#monthlyReport").on('click',function(e) {
                     if(ttl == ic){
                         var reportName = "foodreport-frm:"+$("#dt1").val()+"-to:"+$("#dt2").val()+"-for:"+$("#foodVendorList option:selected").html();
                         exportTableToExcel('tblData', reportName);
+                        $("#monthlyReportLoader").addClass("hidden");
                     }
                 });
-            }else $("#dataRecords").html('');
+            }else{
+                $("#dataRecords").html('');  
+                $("#monthlyReportLoader").addClass("hidden");
+                alert("Data not available for selection criteria");
+            } 
         }
     });
 });
 $("#dashboardReport").on('click',function(e) {
+    var currDate = new Date();
+    var fDate = new Date($("#dDt1").val());
+    var tDate = new Date($("#dDt2").val());
+    if(!$("#dDt1").val()){
+        alert("Please enter Start date");
+        return;
+    }else if(!$("#dDt2").val()){
+        alert("Please enter End date");
+        return;
+    }else if(currDate < fDate || currDate < tDate){
+        alert("Date should be past Date!");
+        return;
+    }else if(fDate > tDate){
+        alert("Please enter End date is greater than start Date!");
+        return;       
+    }
     var paramdata = {
         date1: $("#dDt1").val(),
         date2: $("#dDt2").val()
     };
     $("#dataDashboardRecords1 , #dataDashboardRecords2 , #dataDashboardRecords3 ,  #dataDashboardRecords4").html('');
+    $("#dashboardReportLoader").removeClass("hidden");
     $.ajax({
         url: "downloadDashboardReport",
         method: "POST",
@@ -1095,19 +1161,39 @@ $("#dashboardReport").on('click',function(e) {
                 $.each(ObjRes.qry1Res, function (ic , val){
                     if(ttl == ic) qry3report(ObjRes);
                 });
+                $("#dashboardReportLoader").addClass("hidden");
             }else{
                 $("#dataDashboardRecords1").html('');
+                $("#dashboardReportLoader").addClass("hidden");
+                alert("Data not available for selection criteria");
             }
         }
     });
 });
 
 $("#vendorwiseLunchDinnerReport").on('click',function(e) {
+    var currDate = new Date();
+    var fDate = new Date($("#dlt1").val());
+    var tDate = new Date($("#dlt2").val());
+    if(!$("#dlt1").val()){
+        alert("Please enter Start date");
+        return;
+    }else if(!$("#dlt2").val()){
+        alert("Please enter End date");
+        return;
+    }else if(currDate < fDate || currDate < tDate){
+        alert("Date should be past Date!");
+        return;
+    }else if(fDate > tDate){
+        alert("Please enter End date is greater than start Date!");
+        return;       
+    }
     var paramdata = {
         date1: $("#dlt1").val(),
         date2: $("#dlt2").val()
     };
     $("#datavendorwiseLunchDinnerRecords").html('');
+    $("#vendorReportLoader").removeClass("hidden");
     $.ajax({
         url: "downloadvendorwiseLunchDinnerReport",
         method: "POST",
@@ -1128,10 +1214,13 @@ $("#vendorwiseLunchDinnerReport").on('click',function(e) {
                     if(ttl == ic) {
                         var reportName = "foodVendorReport-frm:"+$("#dlt1").val()+"-to:"+$("#dlt2").val();
                         exportTableToExcel('tblvendorWiseLunchDinnerData', reportName);
+                        $("#vendorReportLoader").addClass("hidden");
                     }
                 });
             }else{
                 $("#datavendorwiseLunchDinnerRecords").html('');
+                $("#vendorReportLoader").addClass("hidden");
+                alert("Data not available for selection criteria");
             }
         }
     });

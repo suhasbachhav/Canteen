@@ -561,6 +561,7 @@ app.post('/downloadvendorwiseLunchDinnerReport',function(request,response){
 
 	response.header("application/json; charset=utf-8");
 	var sqlresult = "SELECT DATE_FORMAT(date_time, '%Y-%m-%d') AS fdate , COUNT(dailyfood.id) AS fCount,  users.vendor, (CASE WHEN DATE_FORMAT(date_time, '%H:%i')>='00:00' && DATE_FORMAT(date_time, '%H:%i')<'02:00' THEN CONCAT(DATE_FORMAT(DATE_SUB(date_time, INTERVAL 1 Day), '%Y-%m-%d'),':Dinner:', users.vendor) WHEN DATE_FORMAT(date_time, '%H:%i')>='17:00' && DATE_FORMAT(date_time, '%H:%i:%s')<='23:59:59' THEN CONCAT(DATE_FORMAT(date_time, '%Y-%m-%d'),':Dinner:', users.vendor) WHEN DATE_FORMAT(date_time, '%H:%i')>='02:00' && DATE_FORMAT(date_time, '%H:%i')<'17:00' THEN CONCAT(DATE_FORMAT(date_time, '%Y-%m-%d'),':Lunch:', users.vendor) ELSE 1 END) AS foodSlot from dailyfood JOIN users ON users.id=dailyfood.updatedby WHERE date_time >='"+fromdate+"' AND date_time <= '"+todate+"' GROUP BY foodSlot";
+		//console.log(sqlresult)
 		con.query(sqlresult, function (error, result, client){
         var resultFinal = JSON.stringify(result);
         response.send(resultFinal);

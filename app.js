@@ -44,17 +44,18 @@ app.post('/',function(request,response){
 		 if(error) throw error;
 
 		 if (results.length > 0) {
-			 request.session.loggedin = true;
-			 request.session.Uid = results[0].id;
-			 request.session.foodservice = results[0].foodservice;
-			 request.session.username = results[0].username;
-			 request.session.vendor = results[0].vendor;
-			 const timestamp = new Date().toISOString();
-			 request.session.timestamp = timestamp;
-			 return response.redirect('/dashboard');
+			request.session.loggedin = true;
+			request.session.Uid = results[0].id;
+			request.session.foodservice = results[0].foodservice;
+			request.session.username = results[0].username;
+			request.session.vendor = results[0].vendor;
+			const timestamp = new Date().toISOString();
+			request.session.timestamp = timestamp;
+			return response.redirect('/dashboard');
 		 } else {
-			 response.json({ message: 'Incorrect Username and/or Password!!' });
-		 }			
+			return response.redirect('/');
+			//response.json({ message: 'Incorrect Username and/or Password!!' });
+		 }
 		 response.end();
 	 });
  } else {

@@ -1,13 +1,14 @@
-    var quality = 60;
+var quality = 60;
 var timeout = 10;
+let select ='<option value="0">-Select-</option>';
+
 function showlastEntries(){
     $("#lastEntries , #dataRecords").html("");
     $.ajax({
-        url: "getlastrecords",
-        method: "POST",
+        url: "todaysRecords",
+        method: "GET",
         ContentType: 'application/json',
-        success: function(resultData) {
-            var ObjRes = JSON.parse(resultData);
+        success: function(ObjRes) {
             var htmlCount = '';
             $.each(ObjRes.count, function (i , val){
                 htmlCount +="<span style='color: green;'><b>"+val.food+": "+val.countFood+"<b><span><br>";
@@ -46,11 +47,10 @@ $("#tokenGeneration").delegate(".vegNonVegCls", 'click', function(){
 function queuePizza(){
     if($("#foodService").val() ==2){
         $.ajax({
-            url: "getqueuePizza",
-            method: "POST",
+            url: "pizza",
+            method: "GET",
             ContentType: 'application/json',
-            success: function(resultData) {
-                var ObjRes = JSON.parse(resultData);
+            success: function(ObjRes) {
                 var html = '';
                 $.each(ObjRes, function (i , val){
                     if(val.status == 0)
@@ -199,12 +199,11 @@ function pieChartData() {
     var qryMonthResCount = new Array();
     
     $.ajax({
-        url: "getDailyCountGraphValues",
+        url: "reports",
         method: "GET",
         data: '',
         ContentType: 'application/json',
         success: function(resultData) {
-            resultData = JSON.parse(resultData);
             for(var k in resultData.qryDayRes) {
                 qryDayResLabel.push(resultData.qryDayRes[k].food);
                 qryDayResCount.push(resultData.qryDayRes[k].countFood);
@@ -217,7 +216,6 @@ function pieChartData() {
                 qryMonthResLabel.push(resultData.qryMonthRes[l].food);
                 qryMonthResCount.push(resultData.qryMonthRes[l].countFood);
             }
-            //console.log(qryWeekResLabel)
             var dayWisePichart = new Chart(dayWise, {
                 type: 'doughnut',
                 data: {
@@ -268,7 +266,7 @@ function pieChartData() {
 }
 setInterval(function(){ 
     pieChartData();
-}, 10000); 
+}, 300 * 1000); 
 $("#updateExistingVendor").click(function() {
     $("#vendorWise , #empCompWiseLbl ,  #UpdateVendorBtn").removeClass('hidden');
     $("#addVendorBtn").addClass('hidden');
@@ -317,17 +315,9 @@ $("#empDeptFood").change(function() {
 });
 $("#tokenGeneration").delegate(".pizzaready", 'click', function(){
     $(this).attr('disabled','disabled');
-    var empIdArr = $(this).attr('id');
-    var srno = $(this).data('srno');
-    var res = empIdArr.split("ReadyId-")[1];
-    var paramdata = {
-        empId: res,
-        srno:srno
-    };
     $.ajax({
-        url: "updatePizzaStatus",
-        method: "POST",
-         data: paramdata,
+        url: `pizza/${$(this).data('srno')}/1`,
+        method: "PUT",
         ContentType: 'application/json',
         success: function(resultData) {
             queuePizza();
@@ -339,17 +329,9 @@ $("#tokenGeneration").delegate(".pizzaready", 'click', function(){
 });
 $("#tokenGeneration").delegate(".pizzaserved", 'click', function(){
     $(this).attr('disabled','disabled');
-    var empIdArr = $(this).attr('id');
-    var srno = $(this).data('srno');
-    var res = empIdArr.split("Served-")[1];
-    var paramdata = {
-        empId: res,
-        srno:srno
-    };
     $.ajax({
-        url: "updatePizzaStatusFinal",
-        method: "POST",
-         data: paramdata,
+        url: `pizza/${$(this).data('srno')}/2`,
+        method: "PUT",
         ContentType: 'application/json',
         success: function(resultData) {
             sessionStorage.removeItem(res);
@@ -373,7 +355,7 @@ $("#entryFood").click(function() {
         vendorId: $("#vendorid").val()
     };
     $.ajax({
-        url: "foodEntry",
+        url: "food",
         method: "POST",
         data: paramdata,
         ContentType: 'application/json',
@@ -382,12 +364,11 @@ $("#entryFood").click(function() {
             showlastEntries();
             $("#lastenterUser").html();
             $("#empFoodId").val();
-            if (resultData == "Invalid Employee") alert("Please enter Valid Employee Id!");
+            if (resultData == "Invalid User") alert("Please enter Valid Employee Id!");
             else if (resultData =="Allready Food Serve") alert("You have allready taken food today");
             else {
-                var ObjData = JSON.parse(resultData);
-                if(ObjData){
-                    var text = ObjData.username+" is added for the "+ObjData.foodType+" of the Day";
+                if(resultData){
+                    var text = resultData.username+" is added for the "+resultData.foodType+" of the Day";
                     $("#lastenterUser").html(text).show();
                 }else alert("Error Occured! Please check Again"); 
             }
@@ -402,20 +383,16 @@ $("#employeeDeactivateReport").click(function() {
         alert("Please enter Employee Id");
         return;
     } 
-    var paramdata = {
-        deactivateEmpId: $("#deactivateEmpId").val()
-    };
     $("#employeeDeactivateReport").removeClass("hidden")
     $.ajax({
-        url: "deactivateemployeelist",
-        method: "POST",
-        data: paramdata,
+        url: `employee/${$("#deactivateEmpId").val()}`,
+        method: "PUT",
         ContentType: 'application/json',
         success: function(resultData) {
             if (resultData == "Updated"){  
                 $("#employeeDeactivateReport").addClass("hidden")
                 alert("Employee Updated Succesfully");
-            }else alert("Something is wrong, Please refrsh and try again");
+            }else alert("Something is wrong, Please refresh and try again");
         },
         error: function(err) {
             console.log(err);
@@ -439,21 +416,14 @@ $("#empFoodReport").on('click',function(e) {
         alert("Please enter End date is greater than start Date!");
         return;       
     }
-    var paramdata = {
-        date1: $("#empdt1").val(),
-        date2: $("#empdt2").val(),
-        empId: $("#empWiseReport").val()
-    };
     $("#dataRecords").html('');
     $("#employeeReportLoader").removeClass("hidden")
     $.ajax({
-        url: "downloadEmpFoodReport",
-        method: "POST",
-        data: paramdata,
+        url: `reports/${$("#empdt1").val()}/${$("#empdt2").val()}/${$("#empWiseReport").val()}`,
+        method: "GET",
         ContentType: 'application/json',
-        success: function(resultData) {
-            if(resultData){
-                var ObjRes = JSON.parse(resultData);
+        success: function(ObjRes) {
+            if(ObjRes){
                 var htmlRes = '';
                 var iii =0;
                 $.each(ObjRes, function (i , val){
@@ -478,19 +448,14 @@ $("#empFoodReport").on('click',function(e) {
     });
 });
 $("#employeeListReport").on('click',function(e) {
-    var paramdata = {
-        empCompWise: $("#empCompWise").val()
-    };
     $("#dataEmpRecords").html('');
     $("#employeeListLoader").addClass("hidden");
     $.ajax({
-        url: "downloadEmpReport",
-        method: "POST",
-        data: paramdata,
+        url: `reports/${$("#empCompWise").val()}`,
+        method: "GET",
         ContentType: 'application/json',
-        success: function(resultData) {
-            if(resultData){
-                var ObjRes = JSON.parse(resultData);
+        success: function(ObjRes) {
+            if(ObjRes){
                 var htmlEmpRes = '';
                 var doubleFood = "No";
                 var ISOdata ='';
@@ -520,22 +485,18 @@ $("#employeeListReport").on('click',function(e) {
     });
 });
 $("#vendorWise").change(function() {
-    var paramdata = {
-        vendorId: $(this).val()
-    };
     $.ajax({
-        url: "checkVendor",
-        method: "POST",
-        data: paramdata,
+        url: `vendor/${$(this).val()}`,
+        method: "GET",
         ContentType: 'application/json',
         success: function(resultData) {
+            resultData = resultData[0];
             if(resultData){
-                var ObjData = JSON.parse(resultData);
-                $("#updateVendorName").val(ObjData.vendor);
-                $("#updateVendorUserName").val(ObjData.username);
-                $("#updateVendorEmail").val(ObjData.email);
-                $("#foodVendorType").val(ObjData.foodservice);
-                $("#foodVendorStatus").val(ObjData.status); 
+                $("#updateVendorName").val(resultData.vendor);
+                $("#updateVendorUserName").val(resultData.username);
+                $("#updateVendorEmail").val(resultData.email);
+                $("#foodVendorType").val(resultData.foodservice);
+                $("#foodVendorStatus").val(resultData.status); 
             }else{
                 $("#updateVendorName , #updateVendorUserName , #updateVendorEmail , #foodVendorType").val('');
             }
@@ -566,22 +527,21 @@ $("#UpdateVendorBtn").click(function() {
         return;
     }
     var paramdata = {
-        updateVendorName: $("#updateVendorName").val(),
-        vendorWise: $("#vendorWise").val(),
-        updateVendorUserName: $("#updateVendorUserName").val(),
-        updateVendorNewPass: $("#updateVendorNewPass").val(),
-        updateVendorEmail: $("#updateVendorEmail").val(),
-        foodVendorType: $("#foodVendorType").val(),
-        foodVendorStatus: $("#foodVendorStatus").val()
+        name: $("#updateVendorName").val(),
+        userName: $("#updateVendorUserName").val(),
+        pass: $("#updateVendorNewPass").val(),
+        email: $("#updateVendorEmail").val(),
+        type: $("#foodVendorType").val(),
+        status: $("#foodVendorStatus").val()
     };
     $.ajax({
-        url: "updateVendor",
-        method: "POST",
+        url: `vendor/${$("#vendorWise").val()}`,
+        method: "PUT",
         data: paramdata,
         ContentType: 'application/json',
         success: function(resultData) {
-            if (resultData == "Updated") alert("User Updated Succesfully");
-            else alert("Please refrsh and check again");
+            if (resultData.affectedRows) alert("User Updated Succesfully");
+            else alert("Please refresh and check again");
         },
         error: function(err) {
             console.log(err);
@@ -610,15 +570,15 @@ $("#addVendorBtn").click(function() {
     }
     $(this).attr("disabled", true);
     var paramdata = {
-        updateVendorName: $("#updateVendorName").val(),
-        updateVendorUserName: $("#updateVendorUserName").val(),
-        updateVendorNewPass: $("#updateVendorNewPass").val(),
-        updateVendorEmail: $("#updateVendorEmail").val(),
-        foodVendorType: $("#foodVendorType").val(),
-        foodVendorStatus: $("#foodVendorStatus").val()
+        name: $("#updateVendorName").val(),
+        userName: $("#updateVendorUserName").val(),
+        pass: $("#updateVendorNewPass").val(),
+        email: $("#updateVendorEmail").val(),
+        type: $("#foodVendorType").val(),
+        status: $("#foodVendorStatus").val()
     };
     $.ajax({
-        url: "addVendor",
+        url: "vendor",
         method: "POST",
         data: paramdata,
         ContentType: 'application/json',
@@ -627,7 +587,7 @@ $("#addVendorBtn").click(function() {
                 alert("Vendor Added Succesfully");
                 location.reload();
             } else 
-                alert("Please refrsh and check again");
+                alert("Please refresh and check again");
         },
         error: function(err) {
             console.log(err);
@@ -639,24 +599,20 @@ $("#addCompanyBtn").click(function() {
         alert("Please enter Company Name");
         return;
     }
-    var paramdata = {
-        updateCompanyName: $("#updateCompanyName").val()
-    };
     $.ajax({
-        url: "addCompany",
+        url: "company",
         method: "POST",
-        data: paramdata,
+        data: {
+            name: $("#updateCompanyName").val()
+        },
         ContentType: 'application/json',
-        success: function(resultData) {
-            if (resultData) {
-                alert("Company Added Succesfully");
-                getCompany();
-                $("#updateCompanyName").val('');
-            } else 
-                alert("Please refrsh and check again");
+        success: function(res) {
+            alert(res.affectedRows ? "Company created Succesfully" : "Please refresh and check again");
+            getCompany();
+            $("#updateCompanyName").val('');
         },
         error: function(err) {
-            console.log(err);
+            alert('Company not created');
         }
     });
 });
@@ -669,24 +625,20 @@ $("#UpdateCompanyBtn").click(function() {
         return;
     }
     var paramdata = {
-        updateCompanyName: $("#updateCompanyName").val(),
-        updateCompanyId: $("#companyDropdwn").val()
+        name: $("#updateCompanyName").val(),
+        id: $("#companyDropdwn").val()
     };
     $.ajax({
-        url: "updateCompany",
-        method: "POST",
-        data: paramdata,
+        url: `company/${paramdata.name}/${paramdata.id}`,
+        method: "PUT",
         ContentType: 'application/json',
-        success: function(resultData) {
-            if (resultData == "Updated"){
-                alert("Company Updated Succesfully");
-                getCompany();
-                $("#updateCompanyName").val('');
-            }else
-                alert("Please refrsh and check again");
+        success: function(res) {
+            alert(res.affectedRows ? "Company Updated Succesfully" : "Please refresh and check again");
+            $("#updateCompanyName").val('');
+            getCompany();
         },
         error: function(err) {
-            console.log(err);
+            alert('Company not Updated');
         }
     });
 });
@@ -696,23 +648,20 @@ $("#addDepartmentBtn").click(function() {
         return;
     }
     var paramdata = {
-        updateDepartmentName: $("#updateDepartmentName").val()
+        deptName: $("#updateDepartmentName").val()
     };
     $.ajax({
-        url: "addDepartment",
+        url: "departments",
         method: "POST",
         data: paramdata,
         ContentType: 'application/json',
         success: function(resultData) {
-            if (resultData) {
-                alert("Department Added Succesfully");
-                getDepartment();
-                $("#updateDepartmentName").val('');
-            } else 
-                alert("Please refrsh and check again");
+            alert(resultData.affectedRows ? "Department created Succesfully" : "Please refresh and check again");
+            $("#updateDepartmentName").val('');
+            getDepartment();
         },
         error: function(err) {
-            console.log(err);
+            alert('Department not created');
         }
     });
 });
@@ -730,26 +679,21 @@ $("#UpdateDepartmentBtn").click(function() {
         alert("Please Select Department");
         return;
     }
-    var paramdata = {
-        updateDepartmentName: $("#updateDepartmentName").val(),
-        updateDepartmentId: $("#departmentDropdwn").val()
+    var deptParam = {
+        name: $("#updateDepartmentName").val(),
+        id: $("#departmentDropdwn").val()
     };
     $.ajax({
-        url: "updateDepartment",
-        method: "POST",
-        data: paramdata,
+        url: `departments/${deptParam.name}/${deptParam.id}`,
+        method: "put",
         ContentType: 'application/json',
-        success: function(resultData) {
-            if (resultData == "Updated"){
-                alert("Department Updated Succesfully");
-                getDepartment();
-                $("#updateDepartmentName").val('');
-            }
-            else
-                alert("Please refrsh and check again");
+        success: function(res) {
+            alert(res.affectedRows ? "Department Updated Succesfully" : "Please refresh and check again");
+            $("#updateDepartmentName").val('');
+            getDepartment();
         },
         error: function(err) {
-            console.log(err);
+            alert('Department not Updated');
         }
     });
 });
@@ -764,7 +708,7 @@ $(document).ready(function() {
 
     setInterval(function(){ 
         if($("#foodService").val() == 0) showlastEntries();    
-    }, 8000);
+    }, 300 * 1000);
     $("#dt1").datepicker({
         format: "yyyy-mm-dd",
         minDate: 0,
@@ -835,64 +779,58 @@ $(document).ready(function() {
     });
     getCompany();
     $.ajax({
-        url: "getusers",
+        url: "vendor",
         method: "GET",
         data: '',
         ContentType: 'application/json',
         success: function(resultData) {
-            resultData = JSON.parse(resultData)
+            const result = resultData.map((val)=>{
+                return `<option value="${val.id}">${val.vendor}</option>`
+            })
             var html ='<option value="0">---SELECT Vendor---</option>';
-            $.each(resultData, function (i , val){
-                html += '<option value="'+val.id+'">'+val.vendor+'</option>';
-            });
-            $("#vendorWise").html(html);
+            $("#vendorWise").html(html+result);
         },
         error: function(err) {
             console.log(err);
         }
     });
     $.ajax({
-        url: "getfoodtype",
+        url: "food",
         method: "GET",
-        data: '',
         ContentType: 'application/json',
         success: function(resultData) {
-            resultData = JSON.parse(resultData)
             var html ='<option value="">-SELECT-</option>';
-            $.each(resultData, function (i , val){
-                html += '<option value="'+val.id+'">'+val.foodType+'</option>';
+
+            const result = resultData.map((val)=>{
+                return '<option value="'+val.id+'">'+val.foodType+'</option>';
             });
-            $("#foodVendorType").html(html);
+            $("#foodVendorType").html(html + result);
         },
         error: function(err) {
             console.log(err);
         }
     });
     $.ajax({
-        url: "getuserwise",
+        url: "vendor",
         method: "GET",
-        data: '',
         ContentType: 'application/json',
         success: function(resultData) {
-            resultDataArr = JSON.parse(resultData);
-            var html ='';
-            var size = Object.keys(resultDataArr).length;
-            if(size > 1){
+            let html ='';
+            if(Object.keys(resultData).length){
                 html ='<option value="0">---ALL---</option>';
             }
-            $.each(resultDataArr, function (i , val){
-               html += '<option value="'+val.id+'">'+val.vendor+'</option>';
-            });
-            $("#foodVendorList").html(html);
+            const result = resultData.map((val)=>{
+                return `<option value="${val.id}">${val.vendor}</option>`
+            })
+            $("#foodVendorList").html(html+result);
         },
         error: function(err) {
             console.log(err);
         }
     });
     $.ajax({
-        url: "getsessionData",
+        url: "session",
         method: "GET",
-        data: '',
         ContentType: 'application/json',
         success: function(resultData) {
             $("#UserName").html(resultData.vendor);
@@ -916,16 +854,13 @@ $(document).ready(function() {
     });
     getDepartment();
     $.ajax({
-        url: "getIsoData",
-        method: "POST",
-        data: '',
+        url: "employee",
+        method: "GET",
         ContentType: 'application/json',
         success: function(resultData) {
-            var html ='';
-            var resultDataArr = JSON.parse(resultData);
-            $.each(resultDataArr, function (i , val){
-                html += '<input type="hidden" class="ISOdata isoClass-'+val.department+'" id="emp-'+val.emp_id+'" value="'+val.ISOdata+'" data-department="'+val.department+'"/>';
-            });
+            let html = resultData.map((val)=>{
+                return '<input type="hidden" class="ISOdata isoClass-'+val.department+'" id="emp-'+val.emp_id+'" value="'+val.ISOdata+'" data-department="'+val.department+'"/>';
+            })
             $("#isoDataDiv").html(html);
         },
         error: function(err) {
@@ -935,20 +870,14 @@ $(document).ready(function() {
 });
 function getDepartment(){
     $.ajax({
-        url: "getDepartment",
+        url: "departments",
         method: "GET",
-        data: '',
         ContentType: 'application/json',
         success: function(resultData) {
-            var resultDataArr = JSON.parse(resultData);
-            var html ='<option value="0">-Select Department-</option>';
-            var htmlUDept ='';
-            $.each(resultDataArr, function (i , val){
-                html += '<option value="'+val.id+'">'+val.dept_name+'</option>';
-                htmlUDept += '<option value="'+val.id+'">'+val.dept_name+'</option>';
-            });
-            $("#empDept , #empDeptFood").html(html);
-            $("#departmentDropdwn").html(html);
+            let departmentDropDown = resultData.map((val)=>{
+                return '<option value="'+val.id+'">'+val.dept_name+'</option>'
+            })
+            $("#empDept, #empDeptFood, #departmentDropdwn").html(select+departmentDropDown);
         },
         error: function(err) {
             console.log(err);
@@ -957,23 +886,18 @@ function getDepartment(){
 }
 function getCompany(){
     $.ajax({
-            url: "getcompany",
+            url: "company",
             method: "GET",
-            data: '',
             ContentType: 'application/json',
             success: function(resultData) {
-                resultData = JSON.parse(resultData)
-                var html ="<option value=''>---SELECT---</option>";
-                var htmlCompWise ="<option value='0'>---ALL---</option>";
-                var htmlUComp ="";
-                $.each(resultData, function (i , val){
-                    htmlCompWise += "<option value='"+val.compID+"'>"+val.comp_name+"</option> ";
-                    html += "<option value='"+val.compID+"'>"+val.comp_name+"</option> ";
-                    htmlUComp += "<option value='"+val.compID+"'>"+val.comp_name+"</option> ";
-                });
-                $("#empComp").html(html);
-                $("#companyDropdwn").html(htmlUComp);
-                $("#empCompWise").html(htmlCompWise);
+                const htmlDropDown = resultData.map((val)=>{
+                    return "<option value='"+val.compID+"'>"+val.comp_name+"</option>"
+                })
+                const html ="<option value=''>---SELECT---</option>";
+                const htmlCompWise ="<option value='0'>---ALL---</option>";
+                $("#empComp").html(html + htmlDropDown);
+                $("#companyDropdwn").html(htmlDropDown);
+                $("#empCompWise").html(htmlCompWise + htmlDropDown);
             },
             error: function(err) {
                 console.log(err);
@@ -983,17 +907,12 @@ function getCompany(){
 }
 $("#empId").on('change',function(e) {
     if($(this).val().length > 2){
-        var paramdata = {
-            empId: $(this).val()
-        };
         $.ajax({
-            url: "checkEmp",
-            method: "POST",
-            data: paramdata,
+            url: `employee/${$(this).val()}`,
+            method: "GET",
             ContentType: 'application/json',
-            success: function(resultData) {
-                if(resultData){
-                    var ObjData = JSON.parse(resultData);
+            success: function(ObjData) {
+                if(ObjData){
                     $("#empName").val(ObjData.user_name);
                     $("#empDept").val(ObjData.department);
                     $("#empComp").val(ObjData.emp_Comp);
@@ -1047,20 +966,20 @@ $("#registerBtn").click(function() {
         empFoodAllow: empFoodAllow
     };
     $.ajax({
-        url: "register",
+        url: "employee",
         method: "POST",
         data: paramdata,
         ContentType: 'application/json',
         success: function(resultData) {
             if (resultData == "User Allready exist") {
                 alert("User Allready Exist!");
-            } else if (resultData == "Updated") {
+            } else if (resultData.existing) {
                 alert("User Updated Succesfully");
                 location.reload();
-            }else if (resultData) {
+            }else if (resultData.affectedRows) {
                 alert("User Added Succesfully");
                 location.reload();
-            } else  alert("Please refrsh and check again");
+            } else  alert("Please refresh and check again");
         },
         error: function(err) {
             console.log(err);
@@ -1093,20 +1012,17 @@ $("#monthlyReport").on('click',function(e) {
     $("#dataRecords").html('');
     $("#monthlyReportLoader").removeClass("hidden")
     $.ajax({
-        url: "downloadFoodServeReport",
-        method: "POST",
-        data: paramdata,
+        url: `reports/${paramdata.date1}/${paramdata.date2}/${paramdata.mealType}/${paramdata.foodvendorList}`,
+        method: "GET",
         ContentType: 'application/json',
         success: function(resultData) {
             if(resultData){
-                var ObjRes = JSON.parse(resultData);
-                var htmlRes = '';
-                $.each(ObjRes, function (i , val){
-                    htmlRes += "<tr><th>"+val.empId+"</th><th>"+val.user_name+"</th><th>"+val.food+"</th><th>"+val.fooddate+"</th><th>"+val.companyName+"</th><th>"+val.foodVendor+"</th><th>"+val.timeInterval+"</th></tr>";
-                });
+                let htmlRes = resultData.map((val)=>{
+                    return "<tr><th>"+val.empId+"</th><th>"+val.user_name+"</th><th>"+val.food+"</th><th>"+val.fooddate+"</th><th>"+val.companyName+"</th><th>"+val.foodVendor+"</th><th>"+val.timeInterval+"</th></tr>"
+                })
                 $("#dataRecords").html(htmlRes);
-                var ttl = Object.keys(ObjRes).length - 1;
-                $.each(ObjRes, function (ic , val){
+                var ttl = Object.keys(resultData).length - 1;
+                $.each(resultData, function (ic , val){
                     if(ttl == ic){
                         var reportName = "foodreport-frm:"+$("#dt1").val()+"-to:"+$("#dt2").val()+"-for:"+$("#foodVendorList option:selected").html();
                         exportTableToExcel('tblData', reportName);
@@ -1138,20 +1054,14 @@ $("#dashboardReport").on('click',function(e) {
         alert("Please enter End date is greater than start Date!");
         return;       
     }
-    var paramdata = {
-        date1: $("#dDt1").val(),
-        date2: $("#dDt2").val()
-    };
     $("#dataDashboardRecords1 , #dataDashboardRecords2 , #dataDashboardRecords3 ,  #dataDashboardRecords4").html('');
     $("#dashboardReportLoader").removeClass("hidden");
     $.ajax({
-        url: "downloadDashboardReport",
-        method: "POST",
-        data: paramdata,
+        url: `reports/${$("#dDt1").val()}/${$("#dDt2").val()}`,
+        method: "GET",
         ContentType: 'application/json',
-        success: function(resultData) {
-            if(resultData){
-                var ObjRes = JSON.parse(resultData);
+        success: function(ObjRes) {
+            if(ObjRes){
                 var htmlRes = '';
                 $.each(ObjRes.qry1Res, function (i , val){
                     htmlRes += "<tr><th>"+val.food+"</th><th>"+val.countFood+"</th></tr>";
@@ -1188,20 +1098,14 @@ $("#vendorwiseLunchDinnerReport").on('click',function(e) {
         alert("Please enter End date is greater than start Date!");
         return;       
     }
-    var paramdata = {
-        date1: $("#dlt1").val(),
-        date2: $("#dlt2").val()
-    };
     $("#datavendorwiseLunchDinnerRecords").html('');
     $("#vendorReportLoader").removeClass("hidden");
     $.ajax({
-        url: "downloadvendorwiseLunchDinnerReport",
-        method: "POST",
-        data: paramdata,
+        url: `vendorReport/${$("#dlt1").val()}/${$("#dlt2").val()}`,
+        method: "GET",
         ContentType: 'application/json',
-        success: function(resultData) {
-            if(resultData){
-                var ObjRes = JSON.parse(resultData);
+        success: function(ObjRes) {
+            if(ObjRes){
                 var htmlRes = '';
                 $.each(ObjRes, function (i , val){
                     var slot = val.foodSlot;
@@ -1257,7 +1161,7 @@ function qry2report(ObjRes) {
     var ttl = Object.keys(ObjRes.qry4Res).length - 1;
     $.each(ObjRes.qry4Res, function (ic , val){
         if(ttl == ic){
-            var reportName = "dashboardreport-frm:"+$("#dt1").val()+"-to:"+$("#dt2").val();
+            var reportName = "dashboardreport-frm:"+$("#dDt1").val()+"-to:"+$("#dDt2").val();
             exportTableToExcel('tblDashboardData', reportName);
         }
     });

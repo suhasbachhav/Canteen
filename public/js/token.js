@@ -1,8 +1,7 @@
 setInterval(function(){ 
     $.ajax({
-        url: "gettokenscreendata",
-        method: "POST",
-        data: '',
+        url: "tokenData",
+        method: "GET",
         ContentType: 'application/json',
         success: function(resultData) {
             resultData = JSON.parse(resultData)
@@ -27,9 +26,8 @@ setInterval(function(){
 }, 1000);
 $(document).ready(function() {
 $.ajax({
-        url: "gettokenscreendata",
-        method: "POST",
-        data: '',
+        url: "tokenData",
+        method: "GET",
         ContentType: 'application/json',
         success: function(resultData) {
             resultData = JSON.parse(resultData)

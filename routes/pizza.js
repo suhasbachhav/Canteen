@@ -21,7 +21,7 @@ pizza.get('/', async (req, res) => {
 		res.header("application/json; charset=utf-8");
 		res.json(await returnResultSet(qry1));
 	} catch (e){
-		res.status(400).json({message: 'pizza not found'})
+		res.status(404).json({message: 'pizza not found'})
 	}
 });
 
@@ -32,7 +32,7 @@ pizza.put('/:srno/:status', async (req, res) => {
 			affectedRows: resultSet.affectedRows ?? undefined
 		});
 	} catch (e){
-		res.status(400).json({message: 'food status not found'})
+		res.status(404).json({message: 'food status not found'})
 	}
 });
 

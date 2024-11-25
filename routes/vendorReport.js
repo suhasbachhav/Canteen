@@ -18,7 +18,7 @@ vendorReport.get('/:startDate/:endDate/', async (req, res) => {
 		res.header("application/json; charset=utf-8");
 		res.json(await returnResultSet(query));
 	} catch (e){
-		res.status(400).json({message: 'report not found'})
+		res.status(404).json({message: 'report not found'})
 	}
 });
 

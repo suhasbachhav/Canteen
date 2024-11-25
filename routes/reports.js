@@ -29,7 +29,7 @@ reports.get('/', async (req, res) => {
 		res.header("application/json; charset=utf-8");
 		res.json({qryDayRes:qry1Res, qryWeekRes:qry2Res , qryMonthRes:qry3Res});
 	} catch (e){
-		res.status(400).json({message: 'report not found'})
+		res.status(404).json({message: 'report not found'})
 	}
 });
 
@@ -46,7 +46,7 @@ reports.get('/:companyId', async (req, res) => {
 		res.header("application/json; charset=utf-8");
 		res.json(await returnResultSet(query));
 	} catch (e){
-		res.status(400).json({message: 'report not found'})
+		res.status(404).json({message: 'report not found'})
 	}
 });
 
@@ -76,7 +76,7 @@ reports.get('/:startDate/:endDate/', async (req, res) => {
 		res.header("application/json; charset=utf-8");
 		res.json({qry1Res:qry1Res, qry2Res:qry2Res , qry3Res:qry3Res, qry4Res:qry4Res});
 	} catch (e){
-		res.status(400).json({message: 'report not found'})
+		res.status(404).json({message: 'report not found'})
 	}
 });
 
@@ -97,7 +97,7 @@ reports.get('/:startDate/:endDate/:empId', async (req, res) => {
 		res.header("application/json; charset=utf-8");
 		res.json(await returnResultSet(query));
 	} catch (e){
-		res.status(400).json({message: 'report not found'})
+		res.status(404).json({message: 'report not found'})
 	}
 });
 
@@ -130,7 +130,7 @@ reports.get('/:startDate/:endDate/:mealType/:vendorList', async (req, res) => {
 		res.header("application/json; charset=utf-8");
 		res.json(await returnResultSet(query));
 	} catch (e){
-		res.status(400).json({message: 'report not found'})
+		res.status(404).json({message: 'report not found'})
 	}
 });
 

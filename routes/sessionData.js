@@ -10,7 +10,7 @@ sessionData.get('/', async (req, res) => {
 			id  : req.session.Uid
 		});
 	} catch (e){
-		res.status(400).json({message: 'No session data'})
+		res.status(404).json({message: 'No session data'})
 	}
 });
 sessionData.get('/logout', async (req, res) => {
@@ -18,7 +18,7 @@ sessionData.get('/logout', async (req, res) => {
 		req.session.destroy();
 		res.redirect('/');	
 	} catch (e){
-		res.status(400).json({message: 'No session data'})
+		res.status(404).json({message: 'No session data'})
 	}
 });
 

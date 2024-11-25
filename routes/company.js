@@ -7,7 +7,7 @@ company.get('/', async (req, res) => {
 	try{
 		res.json(await returnResultSet('SELECT compID, comp_name FROM `company` WHERE status =1 ORDER BY comp_name ASC'));
 	} catch (e){
-		res.status(400).json({message: 'company not found'})
+		res.status(404).json({message: 'company not found'})
 	}
 });
 

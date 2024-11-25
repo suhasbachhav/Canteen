@@ -7,7 +7,7 @@ food.get('/', async (req, res) => {
 	try{
 		res.json(await returnResultSet("SELECT * FROM `foodtype`"));
 	} catch (e){
-		res.status(400).json({message: 'food not found'})
+		res.status(404).json({message: 'food not found'})
 	}
 });
 
@@ -47,7 +47,7 @@ food.post('/',async(req,res) =>{
 					res.json({username:qry1Res[0].user_name, foodType:food});
 				} else res.status(400).send("Error on food Entry");
 			}
-		} else res.send("Invalid User");
+		} else res.status(404).send("Invalid User");
 	
 	} catch (e){
 		res.status(400).json({message: 'Error on food Entry'})

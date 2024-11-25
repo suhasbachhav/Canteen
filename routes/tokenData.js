@@ -20,7 +20,7 @@ tokenData.get('/', async (req, res) => {
 		
 		res.json(await returnResultSet(qry1));
 	} catch (e){
-		res.status(400).json({message: 'users not found'})
+		res.status(404).json({message: 'tokendata not found'})
 	}
 });
 

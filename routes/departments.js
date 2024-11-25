@@ -7,7 +7,7 @@ departments.get('/', async (req, res) => {
 	try{
 		res.json(await returnResultSet('SELECT * FROM `departments` ORDER BY dept_name ASC'));
 	} catch (e){
-		res.status(400).json({message: 'Departments not found'})
+		res.status(404).json({message: 'Departments not found'})
 	}
 });
 

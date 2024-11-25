@@ -7,14 +7,14 @@ employee.get('/', async (req, res) => {
 	try{
 		res.json(await returnResultSet('SELECT emp_id, ISOdata, department FROM `emp_data` WHERE status =1 AND ISOdata !="" ORDER BY department'));
 	} catch (e){
-		res.status(400).json({message: 'employee not found'})
+		res.status(404).json({message: 'employee not found'})
 	}
 });
 employee.get('/:id', async (req, res) => {
 	try{
 		res.json(await returnResultSet('SELECT ISOdata, department, doubleFood, emp_Comp, emp_id, status,user_name, base64Img FROM emp_data WHERE emp_id = ?', [req.params.id]));
 	} catch (e){
-		res.status(400).json({message: 'employee not found'})
+		res.status(404).json({message: 'employee not found'})
 	}
 });
 
@@ -56,7 +56,7 @@ employee.put('/:idArr', async (req, res) => {
 			affectedRows: resultSet.affectedRows ?? undefined
 		});
 	} catch (e){
-		res.status(400).json({message: 'employee not found'})
+		res.status(404).json({message: 'employee not found'})
 	}
 });
 

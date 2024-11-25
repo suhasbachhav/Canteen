@@ -35,7 +35,7 @@ todaysRecords.get('/', async (req, res) => {
 		res.header("application/json; charset=utf-8");
 		res.json({count:qry2Res, records:qry1Res});
 	} catch (e){
-		res.status(400).json({message: 'report not found'})
+		res.status(404).json({message: 'report not found'})
 	}
 });
 

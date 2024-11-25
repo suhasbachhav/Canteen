@@ -26,7 +26,7 @@ vendor.get('/vendorwise', async (req, res) => {
 			"SELECT id , vendor FROM `users` WHERE foodservice != 0";
 		res.json(await returnResultSet(userSql));
 	} catch (e){
-		res.status(400).json({message: 'users not found'})
+		res.status(404).json({message: 'users not found'})
 	}
 });
 
